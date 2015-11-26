@@ -355,6 +355,8 @@ if (typeof(jQuery) === 'undefined') {
 
               selectedEmoji = true;
 
+              currentChars = '';
+
               event.preventDefault();
             }
             return;
@@ -384,6 +386,8 @@ if (typeof(jQuery) === 'undefined') {
               //$(d).scrollTop($(d).find('div.active img').position().top);
 
               selectedEmoji = true;
+
+              currentChars = '';
 
               event.preventDefault();
             }
