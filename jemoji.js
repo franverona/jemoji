@@ -267,6 +267,56 @@ if (typeof(jQuery) === 'undefined') {
     });
 
     var currentChars = '', currentVal, currentEmoji;
+
+    var filterEmoji = function () {
+      // Use emojis after two character are typed
+      if (currentChars.length >= 2) {
+        // Escape especial characters
+        var regex = new RegExp('^([a-zA-Z0-9]|_?)*' + currentChars.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&") + '([a-zA-Z0-9]|_?)*');
+
+        var $domMenu = $(d), dom = $domMenu[0];
+
+        var dir = _this._defaults.folder;
+        if (_this._options.folder) {
+          dir = _this._options.folder;
+        }
+
+        // Get emojis that match user input
+        var innerHTML = '', ext = (typeof(_this._options.extension))? _this._options.extension : _this._defaults;
+        for (var i = 0, l = _this._icons.length; i < l; i++) {
+          currentEmoji = _this._icons[i];
+          if (regex.test(currentEmoji)) {
+            var classActive = '';
+            if (innerHTML === '')
+              classActive = 'class="active"';   // First emoji set as 'active'
+
+            innerHTML += '<div ' + classActive + '>' + 
+                            '<img src="' + dir + currentEmoji + '.' + ext + '" alt="' + currentEmoji + '" />' +
+                            '<span>:' + currentEmoji + ':</span>' +
+                          '</div>';
+          }
+        }
+        dom.innerHTML = innerHTML;
+
+        $el.data('jemojiContainer', $domMenu.closest('.jemoji-menu')[0]);
+
+        if (dom.innerHTML.length === 0) {
+          _this.close();    // No emojis
+          currentChars = '';
+          menuOpened = false;
+        }
+        else {
+          // Insert emojis on click
+          $el.data('jemojiclick').call();
+
+          _this.open();
+        }
+      }
+    };
+
+    //
+    // Keydown to detect arrows, esc and backspace
+    //
     $el.keydown(function (event) {
 
       // Close menu on ESC
@@ -276,43 +326,6 @@ if (typeof(jQuery) === 'undefined') {
         return;
       }
 
-      // Type selected emoji on Enter if menu is opened
-      if (event.which === 13 && _this.isOpen()) {
-        $el.focus();
-        _this.close();
-        menuOpened = false;
-        currentChars = '';
-        arrowsCursorBegin = arrowsCursorEnd = -1;
-        if (!selectedEmoji) {
-          // Use case: user open menu, so first emoji is already selected; then press Enter
-          currentEmoji = $(d).find('div.active img').attr('alt');
-          if (arrowsCursorBegin === -1)
-            arrowsCursorBegin = getCursorPosition();
-          if (arrowsCursorEnd === -1)
-            arrowsCursorEnd = getCursorPosition();
-
-          currentVal = $el.val();
-          currentVal = currentVal.slice(0, currentVal.lastIndexOf(':', arrowsCursorBegin)) + ':' + currentEmoji + ': ' + currentVal.slice(arrowsCursorEnd);
-          $el.val(currentVal);
-        }
-
-        $(menuContainer).find('.jemoji-icons').html('');
-
-        event.preventDefault();
-        return;
-      }
-
-      // Open emoji menu on press ':' key
-      if (event.shiftKey && event.which === 190) {
-        if (!menuOpened) {
-          menuOpened = true;
-          currentChars = '';
-          arrowsCursorBegin = arrowsCursorEnd = -1;
-        }
-        return;
-      }
-
-      // Menu opened
       if (menuOpened) {
 
         var currentVal = $el.val();
@@ -381,54 +394,72 @@ if (typeof(jQuery) === 'undefined') {
         // Backspace
         if (event.which === 8) {
           currentChars = currentChars.slice(0, -1);
-        }
-        else {
-          currentChars += String.fromCharCode(event.which).toLowerCase();
-        }
 
-        // Use emojis after two character are typed
-        if (currentChars.length >= 2) {
-          // Escape especial characters
-          var regex = new RegExp('^([a-zA-Z0-9]|_?)*' + currentChars.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&") + '([a-zA-Z0-9]|_?)*');
+          var currentVal = $el.val();
 
-          var $domMenu = $(d), dom = $domMenu[0];
+          var $divs = $(d).find('div'), $index = $divs.index($(d).find('div.active'));
 
-          var dir = _this._defaults.folder;
-          if (_this._options.folder) {
-            dir = _this._options.folder;
-          }
-
-          // Get emojis that match user input
-          var innerHTML = '', ext = (typeof(_this._options.extension))? _this._options.extension : _this._defaults;
-          for (var i = 0, l = _this._icons.length; i < l; i++) {
-            currentEmoji = _this._icons[i];
-            if (regex.test(currentEmoji)) {
-              var classActive = '';
-              if (innerHTML === '')
-                classActive = 'class="active"';   // First emoji set as 'active'
-
-              innerHTML += '<div ' + classActive + '>' + 
-                              '<img src="' + dir + currentEmoji + '.' + ext + '" alt="' + currentEmoji + '" />' +
-                              '<span>:' + currentEmoji + ':</span>' +
-                            '</div>';
-            }
-          }
-          dom.innerHTML = innerHTML;
-
-          $el.data('jemojiContainer', $domMenu.closest('.jemoji-menu')[0]);
-
-          if (dom.innerHTML.length === 0) {
-            _this.close();    // No emojis
-            currentChars = '';
-            menuOpened = false;
-          }
-          else {
-            // Insert emojis on click
-            $el.data('jemojiclick').call();
-
-            _this.open();
+          // Backspace
+          if (event.which === 8) {
+            currentChars = currentChars.slice(0, -1);
+            filterEmoji();
           }
         }
+      }
+
+    });
+
+    //
+    // Keypress for rest of keys
+    //
+    $el.keypress(function (event) {
+
+      // Type selected emoji on Enter if menu is opened
+      if (event.which === 13 && _this.isOpen()) {
+        $el.focus();
+        _this.close();
+        menuOpened = false;
+        currentChars = '';
+        arrowsCursorBegin = arrowsCursorEnd = -1;
+        if (!selectedEmoji) {
+          // Use case: user open menu, so first emoji is already selected; then press Enter
+          currentEmoji = $(d).find('div.active img').attr('alt');
+          if (arrowsCursorBegin === -1)
+            arrowsCursorBegin = getCursorPosition();
+          if (arrowsCursorEnd === -1)
+            arrowsCursorEnd = getCursorPosition();
+
+          currentVal = $el.val();
+          currentVal = currentVal.slice(0, currentVal.lastIndexOf(':', arrowsCursorBegin)) + ':' + currentEmoji + ': ' + currentVal.slice(arrowsCursorEnd);
+          $el.val(currentVal);
+        }
+
+        $(menuContainer).find('.jemoji-icons').html('');
+
+        event.preventDefault();
+        return;
+      }
+
+      // Open emoji menu on press ':' key
+      if (event.which === 58) {
+        if (!menuOpened) {
+          menuOpened = true;
+          currentChars = '';
+          arrowsCursorBegin = arrowsCursorEnd = -1;
+        }
+        return;
+      }
+
+      // Menu opened
+      if (menuOpened) {
+
+        var currentVal = $el.val();
+
+        var $divs = $(d).find('div'), $index = $divs.index($(d).find('div.active'));
+
+        currentChars += String.fromCharCode(event.which).toLowerCase();
+
+        filterEmoji();
       }
       
     });
