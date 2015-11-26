@@ -2,6 +2,9 @@
 
 **jEmoji** is a plugin which provides you a simple way to let your users type emojis in your input forms. A lot of social applications like Twitter, Slack or Facebook integrate them, and now there is no reason for you to do the same.
 
+*      [Official page] (http://franverona.com/jemoji)
+*      [Video demo] (https://youtu.be/ymhaXTRhGZ0) (Youtube Link)
+
 ##How to use jEmoji
 
 **jEmoji** needs [jQuery](http://jquery.com/download/) to work, so you have to include [jQuery](http://jquery.com/download/) in your page **BEFORE** using this plugin. I tested it with jQuery v1.11.2, and it works well.
