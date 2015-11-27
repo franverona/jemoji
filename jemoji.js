@@ -154,6 +154,46 @@ if (typeof(jQuery) === 'undefined') {
       return pos;
     };
 
+    //
+    // Detect key events on mobile devices
+    // http://stackoverflow.com/a/20508727/552669
+    //
+    function newKeyUpDown(originalFunction, eventType) {
+      return function() {
+        if ("ontouchstart" in document.documentElement) {
+          var $element = $(this),
+            $input = null;
+          if (/input/i.test($element.prop('tagName')))
+            $input = $element;
+          else if ($('input', $element).size() > 0)
+            $input = $($('input', $element).get(0));
+
+          if ($input) {
+            var currentVal = $input.val(),
+              checkInterval = null;
+            $input.focus(function(e) {
+              clearInterval(checkInterval);
+              checkInterval = setInterval(function() {
+                if ($input.val() != currentVal) {
+                  var event = jQuery.Event(eventType);
+                  currentVal = $input.val();
+                  event.which = event.keyCode = (currentVal && currentVal.length > 0) ? currentVal.charCodeAt(currentVal.length - 1) : '';
+                  $input.trigger(event);
+                }
+              }, 30);
+            });
+            $input.blur(function() {
+              clearInterval(checkInterval);
+            });
+          }
+        }
+        return originalFunction.apply(this, arguments);
+      }
+    }
+    $.fn.jemojiKeyup = newKeyUpDown($.fn.keyup, 'keyup');
+    $.fn.jemojiKeydown = newKeyUpDown($.fn.keydown, 'keydown');
+    $.fn.jemojiKeypress = newKeyUpDown($.fn.keypress, 'keypress');
+
     $el.data('jemojiclick', function () {
       $(d).find('div').off('click').on('click', function () {
         var emojiCode = $(this).find('img').attr('alt'), cursor = getCursorPosition(), value = $el.val();
@@ -317,7 +357,7 @@ if (typeof(jQuery) === 'undefined') {
     //
     // Keydown to detect arrows, esc and backspace
     //
-    $el.keydown(function (event) {
+    $el.jemojiKeydown(function (event) {
 
       // Close menu on ESC
       if (event.which === 27 && _this.isOpen()) {
@@ -416,7 +456,7 @@ if (typeof(jQuery) === 'undefined') {
     //
     // Keypress for rest of keys
     //
-    $el.keypress(function (event) {
+    $el.jemojiKeypress(function (event) {
 
       // Type selected emoji on Enter if menu is opened
       if (event.which === 13 && _this.isOpen()) {
