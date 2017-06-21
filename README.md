@@ -2,8 +2,8 @@
 
 **jEmoji** is a plugin which provides you a simple way to let your users type emojis in your input forms. A lot of social applications like Twitter, Slack or Facebook integrate them, and now there is no reason for you to do the same.
 
-*      [Official page](http://franverona.com/jemoji)
-*      [Video demo](https://youtu.be/ymhaXTRhGZ0) (Youtube Link)
+- [Official page](http://franverona.com/jemoji)
+- [Video demo](https://youtu.be/ymhaXTRhGZ0) (Youtube Link)
 
 ## How to use jEmoji
 
