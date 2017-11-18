@@ -36,7 +36,7 @@ jEmoji will create emoji menu and it will start detection when user type ':' (co
 Using [Bootstrap input groups](http://getbootstrap.com/components/#input-groups) we allow our users to open emoji menu on click an specific button.
 
     $('#example').jemoji({
-      menuBtn:    $('#show-menu'),
+      btn:    $('#show-menu'),
       container:  $('#example').parent().parent()
     });
 
