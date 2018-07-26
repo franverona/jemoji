@@ -197,7 +197,7 @@ if (typeof(jQuery) === 'undefined') {
     $el.data('jemojiclick', function () {
       $(d).find('div').off('click').on('click', function () {
         var emojiCode = $(this).find('img').attr('alt'), cursor = getCursorPosition(), value = $el.val();
-        value = value.slice(0, value.lastIndexOf(':', cursor)) + ':' + emojiCode + ': ' + value.slice(cursor);
+        value = value.slice(0, cursor) + ':' + emojiCode + ': ' + value.slice(cursor);
         $el.val(value);
         $el.focus();
         menuOpened = false;
